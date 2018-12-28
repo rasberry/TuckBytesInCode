@@ -15,7 +15,7 @@ namespace test
 		static string OrigText = "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.";
 
 		[TestMethod]
-		public void Test64_1()
+		public void Test64_Encode_1()
 		{
 			var s = new MemoryStream(Encoding.ASCII.GetBytes(OrigText));
 			var enu = TuckBytes.Encode(s,CodecBase64.Self);
@@ -28,12 +28,17 @@ namespace test
 		}
 
 		[TestMethod]
-		public void Test85_1()
+		public void Test64_Decode_1()
+		{
+
+		}
+
+		[TestMethod]
+		public void Test85_Encode_1()
 		{
 			var s = new MemoryStream(Encoding.ASCII.GetBytes(OrigText));
 			var enu = TuckBytes.Encode(s,CodecBase85.Self);
 			string test = String.Concat(enu);
-			Trace.WriteLine("b85 "+test);
 			Assert.AreEqual(B85Text.Length,test.Length);
 			for(int c=0; c<B85Text.Length; c++) {
 				Trace.WriteLine(c+" ["+B85Text[c]+","+test[c]+"]");

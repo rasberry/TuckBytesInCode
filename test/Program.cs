@@ -12,8 +12,8 @@ namespace test
 		static void Main(string[] args)
 		{
 			var tb = new TestBase();
-			// tb.Test64_1();
-			tb.Test85_1();
+			// tb.Test64_Encode_1();
+			tb.Test85_Encode_1();
 			return;
 
 			//Console.WriteLine(CodecUtf8NAscii.AllChars.Length); return;

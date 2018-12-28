@@ -29,7 +29,7 @@ namespace TuckBytesInCode
 		{
 			int bytesIn = map.BytesIn;
 			int bytesOut = map.BytesOut;
-			int @base = (int)Math.Ceiling(Math.Pow(2.0, 8.0 * bytesIn / bytesOut));
+			int @base = map.Base();
 			byte[] bufferIn = new byte[bytesIn];
 			int[] bufferOut = new int[bytesOut];
 			bool printPadding = map.IncludePadding;
@@ -44,30 +44,34 @@ namespace TuckBytesInCode
 				if (read < 1) { break; }
 				streamLength += read;
 
-				Array.Reverse(bufferIn); //little to big endian
+				Array.Reverse(bufferIn); //bit to little endian
 				BigInteger bi = new BigInteger(bufferIn);
 
 				//..and return the chars backwards also
 				int count = bufferOut.Length;
 				while(bi > 0) {
+					//core of the conversion is just finding successive remainders
 					bi = BigInteger.DivRem(bi,@base,out BigInteger rem);
 					bufferOut[--count] = (int)rem;
 				}
 
+				//deal with the padding
 				if (read < bytesIn) {
 					long outLen = (long)Math.Ceiling(
-						(double)streamLength * (double)bytesOut/(double)bytesIn
+						streamLength * (double)bytesOut/(double)bytesIn
 					);
 					long padLen = LongCeil(outLen,bytesOut) * bytesOut;
 					paddingCount = (int)(padLen - outLen);
 				}
 
+				// actuall encoding step
 				for(int i = 0; i < bytesOut - paddingCount; i++) {
 					int val = bufferOut[i];
 					char c = map.Map(val);
 					yield return c;
 				}
 
+				// return padding if necessary
 				if (printPadding && paddingCount > 0) {
 					for(int p = 0; p < paddingCount; p++) {
 						yield return map.Padding;
@@ -76,6 +80,19 @@ namespace TuckBytesInCode
 
 				if (read < bytesIn) { break; }
 			}
+		}
+
+		public static IEnumerable<char> Decode(Stream s, ICharLookup map)
+		{
+			int bytesIn = map.BytesIn;
+			int bytesOut = map.BytesOut;
+			int @base = map.Base();
+			byte[] bufferIn = new byte[bytesIn];
+			int[] bufferOut = new int[bytesOut];
+			//bool printPadding = map.IncludePadding;
+			//long streamLength = 0;
+			//int paddingCount = 0;
+
 		}
 
 		static long LongCeil(long num, long den)
