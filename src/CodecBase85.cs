@@ -11,10 +11,10 @@ namespace TuckBytesInCode
 			}
 			return AllChars[index];
 		}
-
-		public int @Base {
-			get { return AllChars.Length; }
-		}
+		public char Padding { get { return '\0'; }}
+		public bool IncludePadding { get { return false; }}
+		public int BytesIn { get { return 4; }}
+		public int BytesOut { get { return 5; }}
 
 		private CodecBase85() {}
 
@@ -29,6 +29,7 @@ namespace TuckBytesInCode
 		}
 
 		// https://tools.ietf.org/html/rfc1924
-		static string AllChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+		//static string AllChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+		static string AllChars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstu";
 	}
 }

@@ -12,9 +12,10 @@ namespace TuckBytesInCode
 			return AllChars[index];
 		}
 
-		public int @Base {
-			get { return AllChars.Length; }
-		}
+		public char Padding { get { return '='; }}
+		public bool IncludePadding { get { return true; }}
+		public int BytesIn { get { return 3; }}
+		public int BytesOut { get { return 4; }}
 
 		private CodecBase64() {}
 

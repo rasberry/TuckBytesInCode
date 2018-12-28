@@ -97,6 +97,5 @@ here's an example of the spread sheet using base 91 (in A2). The best row turns 
 | _21_ | 14             | 18            | 0.77777777777 | 35.7          | 75              |
 | _22_ | 15             | 19            | 0.78947368421 | 24            | 80              |
 | _23_ | 16             | 20            | 0.8           | 13.47         | 85              |
-|
 
 ## notes ##

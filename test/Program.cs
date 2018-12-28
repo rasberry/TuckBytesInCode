@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using TuckBytesInCode;
 
 namespace test
 {
@@ -6,15 +11,27 @@ namespace test
 	{
 		static void Main(string[] args)
 		{
-			var x = TuckBytesInCode.CodecUtf8NAscii.Self;
-			Console.WriteLine("nn = "+x.Base);
+			var tb = new TestBase();
+			// tb.Test64_1();
+			tb.Test85_1();
+			return;
 
-			int count = 14390;
-			double ratio = Math.Log(count)/(8*Math.Log(2));
-			//double ratio = 1.71998602290273;
-			FindFraction(out double num, out double den, ratio,0.000001);
-			Console.WriteLine(num+"/"+den+" = "+(num/den)+" diff "+Math.Abs(num/den-ratio));
-			Console.WriteLine("count = "+Math.Pow(2,8*num/den));
+			//Console.WriteLine(CodecUtf8NAscii.AllChars.Length); return;
+			//GenerateUtf8Chars(); return;
+
+			/// var x = TuckBytesInCode.CodecUtf8NAscii.Self;
+			// Console.WriteLine("nn = "+x.Base);
+			//14390
+			for (int count = 15000; count >= 13000; count--)
+			{
+				for(int p=1; p<=5; p++)
+				{
+					double ratio = Math.Log(count)/(8*Math.Log(2));
+					//double ratio = 1.71998602290273;
+					FindFraction(out double num, out double den, ratio, 1.0/Math.Pow(10,p));
+					Console.WriteLine(count+"@"+p+" : "+num+"/"+den+" = "+(num/den)+" diff "+Math.Abs(num/den-ratio)+" count = "+Math.Pow(2,8*num/den));
+				}
+			}
 		}
 
 		//TODO look at this way of doing this
@@ -23,7 +40,7 @@ namespace test
 		{
 			num = 1; den = 1;
 			double placeCount = Math.Pow(10,CountPlaces(ratio));
-			Console.WriteLine("placeCount = "+placeCount);
+			// Console.WriteLine("placeCount = "+placeCount);
 			if (placeCount <= 1) {
 				num = ratio;
 				return;
@@ -49,15 +66,89 @@ namespace test
 
 		static double GCD(double a, double b)
 		{
-			while (a != 0 && b != 0)
+			while (a > 0 && b > 0)
 			{
-				if (a > b)
+				if (a > b) {
 					a %= b;
-				else
+				} else {
 					b %= a;
+				}
 			}
+			return a <= 0 ? b : a;
+		}
 
-			return a == 0 ? b : a;
+		static void GenerateUtf8Chars()
+		{
+			int linelen = 80;
+			using (var fs = File.Open("char.txt",FileMode.Create,FileAccess.Write,FileShare.Read))
+			using (var sw = new StreamWriter(fs,Encoding.UTF8))
+			{
+				int count = 0;
+				foreach(char c in DoSomething())
+				{
+					var cat = char.GetUnicodeCategory(c);
+					if (false
+						|| cat == UnicodeCategory.UppercaseLetter
+						|| cat == UnicodeCategory.LowercaseLetter
+						|| cat == UnicodeCategory.TitlecaseLetter
+						|| cat == UnicodeCategory.ModifierLetter
+						|| cat == UnicodeCategory.OtherLetter
+						// || cat == UnicodeCategory.NonSpacingMark
+						// || cat == UnicodeCategory.SpacingCombiningMark
+						|| cat == UnicodeCategory.EnclosingMark
+						|| cat == UnicodeCategory.DecimalDigitNumber
+						|| cat == UnicodeCategory.LetterNumber
+						|| cat == UnicodeCategory.OtherNumber
+						// || cat == UnicodeCategory.SpaceSeparator
+						// || cat == UnicodeCategory.LineSeparator
+						// || cat == UnicodeCategory.ParagraphSeparator
+						// || cat == UnicodeCategory.Control
+						// || cat == UnicodeCategory.Format
+						// || cat == UnicodeCategory.Surrogate
+						// || cat == UnicodeCategory.PrivateUse
+						// || cat == UnicodeCategory.ConnectorPunctuation
+						// || cat == UnicodeCategory.DashPunctuation
+						|| cat == UnicodeCategory.OpenPunctuation
+						|| cat == UnicodeCategory.ClosePunctuation
+						// || cat == UnicodeCategory.InitialQuotePunctuation
+						// || cat == UnicodeCategory.FinalQuotePunctuation
+						|| cat == UnicodeCategory.OtherPunctuation
+						|| cat == UnicodeCategory.MathSymbol
+						|| cat == UnicodeCategory.CurrencySymbol
+						// || cat == UnicodeCategory.ModifierSymbol
+						|| cat == UnicodeCategory.OtherSymbol
+						// || cat == UnicodeCategory.OtherNotAssigned
+					) {
+						sw.Write(c);
+						count = (count + 1) % linelen;
+						if (count <1 ) { sw.Write("\"\n\t+@\""); }
+					}
+				}
+			}
+		}
+
+		static IEnumerable<char> DoSomething()
+		{
+			System.Net.WebClient client = new System.Net.WebClient();
+			string definedCodePoints = File.ReadAllText("UnicodeData.txt");
+			//string definedCodePoints = client.DownloadString("http://unicode.org/Public/UNIDATA/UnicodeData.txt");
+			System.IO.StringReader reader = new System.IO.StringReader(definedCodePoints);
+			System.Text.UTF8Encoding encoder = new System.Text.UTF8Encoding();
+			while(true) {
+				string line = reader.ReadLine();
+				if(line == null) { break; }
+				int codePoint = Convert.ToInt32(line.Substring(0, line.IndexOf(";")), 16);
+				if(codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+					//surrogate boundary; not valid codePoint, but listed in the document
+				} else {
+					string utf16 = char.ConvertFromUtf32(codePoint);
+					byte[] utf8 = encoder.GetBytes(utf16);
+					//TODO: something with the UTF-8-encoded character
+					if (Char.TryParse(utf16,out char c)) {
+						yield return c;
+					}
+				}
+			}
 		}
 	}
 }
