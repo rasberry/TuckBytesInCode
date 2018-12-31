@@ -96,6 +96,33 @@ namespace TuckBytesInCode
 			return null;
 		}
 
+		public static IEnumerable<char> ChangeBase(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
+		{
+
+		}
+
+		static void ChangeBase(int baseIn, int baseOut, int[] digitsIn, ref int[] digitsOut)
+		{
+			BigInteger base10 = BigInteger.Zero;
+			BigInteger bBaseIn = (BigInteger)baseIn;
+			BigInteger bBaseOut = (BigInteger)baseOut;
+			for(int i = 0; i < digitsIn.Length; i++)
+			{
+				BigInteger digit = (BigInteger)digitsIn[i];
+				if (digit >= baseIn) {
+					throw new ArgumentNullException("Input digit must be smaller than the base");
+				}
+				base10 += digit * BigInteger.Pow(bBaseIn,i);
+			}
+			int o = 0;
+			while(base10 > 0)
+			{
+				base10 = BigInteger.DivRem(base10,bBaseOut,out BigInteger rem);
+				digitsOut[o] = (int)rem;
+				o++;
+			}
+		}
+
 		static long LongCeil(long num, long den)
 		{
 			return num / den + (num % den == 0 ? 0 : 1);

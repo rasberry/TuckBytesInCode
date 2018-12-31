@@ -8,7 +8,7 @@ namespace TuckBytesInCode
 	{
 		public char Map(int index)
 		{
-			if (index >= AllChars.Length) {
+			if (index < 0 || index >= AllChars.Length) {
 				throw new IndexOutOfRangeException();
 			}
 			return AllChars[index];
