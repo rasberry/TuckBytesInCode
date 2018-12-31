@@ -93,6 +93,7 @@ namespace TuckBytesInCode
 			//long streamLength = 0;
 			//int paddingCount = 0;
 
+			return null;
 		}
 
 		static long LongCeil(long num, long den)
