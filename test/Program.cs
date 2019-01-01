@@ -11,6 +11,23 @@ namespace test
 	{
 		static void Main(string[] args)
 		{
+			var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
+			foreach(char c in next) {
+				char p = c;
+				if (Char.IsControl(c)) { p = ' '; }
+				Console.WriteLine(p+"\t"+((int)c));
+			}
+			return;
+
+			var gf = new GlifMap(CodecBase85.Self);
+			for(int i=0; i<16; i++)
+			{
+				char c = TestBase.B85Text[i];
+				int x = gf.Map(c);
+				Console.WriteLine(c+"\t"+x);
+			}
+			return;
+
 			var tb = new TestBase();
 			// tb.Test64_Encode_1();
 			tb.Test85_Encode_1();
@@ -22,16 +39,16 @@ namespace test
 			/// var x = TuckBytesInCode.CodecUtf8NAscii.Self;
 			// Console.WriteLine("nn = "+x.Base);
 			//14390
-			for (int count = 15000; count >= 13000; count--)
-			{
-				for(int p=1; p<=5; p++)
-				{
-					double ratio = Math.Log(count)/(8*Math.Log(2));
-					//double ratio = 1.71998602290273;
-					FindFraction(out double num, out double den, ratio, 1.0/Math.Pow(10,p));
-					Console.WriteLine(count+"@"+p+" : "+num+"/"+den+" = "+(num/den)+" diff "+Math.Abs(num/den-ratio)+" count = "+Math.Pow(2,8*num/den));
-				}
-			}
+			//for (int count = 15000; count >= 13000; count--)
+			//{
+			//	for(int p=1; p<=5; p++)
+			//	{
+			//		double ratio = Math.Log(count)/(8*Math.Log(2));
+			//		//double ratio = 1.71998602290273;
+			//		FindFraction(out double num, out double den, ratio, 1.0/Math.Pow(10,p));
+			//		Console.WriteLine(count+"@"+p+" : "+num+"/"+den+" = "+(num/den)+" diff "+Math.Abs(num/den-ratio)+" count = "+Math.Pow(2,8*num/den));
+			//	}
+			//}
 		}
 
 		//TODO look at this way of doing this

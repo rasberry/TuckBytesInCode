@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
+using System.Linq;
 
 namespace TuckBytesInCode
 {
@@ -98,7 +99,42 @@ namespace TuckBytesInCode
 
 		public static IEnumerable<char> ChangeBase(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
 		{
+			int charsOut = inMap.BytesIn * outMap.BytesOut;
+			int charsIn = inMap.BytesOut * outMap.BytesIn;
+			var unInMap = new GlifMap(inMap);
+			int[] inArr = new int[charsIn];
+			int[] outArr = new int[charsOut];
+			var etor = src.GetEnumerator();
+			bool done = false;
 
+			while(!done)
+			{
+				Array.Clear(inArr,0,charsIn);
+				Array.Clear(outArr,0,charsOut);
+
+				int inCount = 0;
+				while(inCount < charsIn)
+				{
+					if (etor.MoveNext()) {
+						int digit = unInMap.Map(etor.Current);
+						int iIndex = charsIn - inCount - 1;
+						inArr[iIndex] = digit;
+					}
+					else {
+						done = true;
+						break;
+					}
+					inCount++;
+				}
+
+				ChangeBase(inMap.Base(),outMap.Base(),inArr,ref outArr);
+
+				for(int o=charsOut-1; o >= 0; o--)
+				{
+					char c = outMap.Map(outArr[o]);
+					yield return c;
+				}
+			}
 		}
 
 		static void ChangeBase(int baseIn, int baseOut, int[] digitsIn, ref int[] digitsOut)
