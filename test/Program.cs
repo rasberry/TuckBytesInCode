@@ -10,23 +10,25 @@ namespace test
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main2(string[] args)
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
 
 			var tb = new TestBase();
-			tb.Test64_Encode_1();
-			// tb.Test85_Encode_1();
+			//tb.Test64_Encode_1();
+			//tb.Test85_Encode_1();
+			tb.Test64_to_85_1();
 		}
 
-		static void Main1(string[] args)
+		static void Main(string[] args)
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
 
 			// var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
-			var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase64.Self);
+			// var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase64.Self);
 			// var next = TuckBytes.ChangeBase(TestBase.B85Text,CodecBase85.Self,CodecBase256.Self);
 			// var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase85.Self);
+			var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase91.Self);
 			
 			foreach(char c in next) {
 				char p = c;
@@ -34,7 +36,10 @@ namespace test
 				Console.WriteLine(p+"\t"+((int)c));
 			}
 			return;
+		}
 
+		static void Main4(string[] args)
+		{
 			var gf = new GlifMap(CodecBase85.Self);
 			for(int i=0; i<16; i++)
 			{

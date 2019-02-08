@@ -4,7 +4,7 @@ using System.IO;
 
 namespace TuckBytesInCode
 {
-	public sealed class CodecUtf8NAscii : ICharLookup
+	public sealed class CodecBase14k : ICharLookup
 	{
 		public char Map(int index)
 		{
@@ -18,13 +18,13 @@ namespace TuckBytesInCode
 		public int BytesIn { get { return 26; }}
 		public int BytesOut { get { return 15; }}
 
-		private CodecUtf8NAscii() {}
+		private CodecBase14k() {}
 
-		static CodecUtf8NAscii _self = null;
-		public static CodecUtf8NAscii Self {
+		static CodecBase14k _self = null;
+		public static CodecBase14k Self {
 			get {
 				if (_self == null) {
-					_self = new CodecUtf8NAscii();
+					_self = new CodecBase14k();
 				}
 				return _self;
 			}

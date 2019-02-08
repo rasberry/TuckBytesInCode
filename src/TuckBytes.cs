@@ -26,76 +26,73 @@ namespace TuckBytesInCode
 		//	}
 		//}
 
-		public static IEnumerable<char> Encode_1(Stream s, ICharLookup map)
-		{
-			int bytesIn = map.BytesIn;
-			int bytesOut = map.BytesOut;
-			int @base = map.Base();
-			byte[] bufferIn = new byte[bytesIn];
-			int[] bufferOut = new int[bytesOut];
-			bool printPadding = map.IncludePadding;
-			long streamLength = 0;
-			int paddingCount = 0;
-
-			while(true)
-			{
-				Array.Clear(bufferIn,0,bufferIn.Length);
-				Array.Clear(bufferOut,0,bufferOut.Length);
-				int read = s.Read(bufferIn,0,bytesIn);
-				if (read < 1) { break; }
-				streamLength += read;
-
-				Array.Reverse(bufferIn); //bit to little endian
-				BigInteger bi = new BigInteger(bufferIn);
-
-				//..and return the chars backwards also
-				int count = bufferOut.Length;
-				while(bi > 0) {
-					//core of the conversion is just finding successive remainders
-					bi = BigInteger.DivRem(bi,@base,out BigInteger rem);
-					bufferOut[--count] = (int)rem;
-				}
-
-				//deal with the padding
-				if (read < bytesIn) {
-					long outLen = (long)Math.Ceiling(
-						streamLength * (double)bytesOut/(double)bytesIn
-					);
-					long padLen = LongCeil(outLen,bytesOut) * bytesOut;
-					paddingCount = (int)(padLen - outLen);
-				}
-
-				// actuall encoding step
-				for(int i = 0; i < bytesOut - paddingCount; i++) {
-					int val = bufferOut[i];
-					char c = map.Map(val);
-					yield return c;
-				}
-
-				// return padding if necessary
-				if (printPadding && paddingCount > 0) {
-					for(int p = 0; p < paddingCount; p++) {
-						yield return map.Padding;
-					}
-				}
-
-				if (read < bytesIn) { break; }
-			}
-		}
-
-		public static IEnumerable<char> Decode_1(Stream s, ICharLookup map)
-		{
-			int bytesIn = map.BytesIn;
-			int bytesOut = map.BytesOut;
-			int @base = map.Base();
-			byte[] bufferIn = new byte[bytesIn];
-			int[] bufferOut = new int[bytesOut];
-			//bool printPadding = map.IncludePadding;
-			//long streamLength = 0;
-			//int paddingCount = 0;
-
-			return null;
-		}
+		//public static IEnumerable<char> Encode_1(Stream s, ICharLookup map)
+		//{
+		//	int bytesIn = map.BytesIn;
+		//	int bytesOut = map.BytesOut;
+		//	int @base = map.Base();
+		//	byte[] bufferIn = new byte[bytesIn];
+		//	int[] bufferOut = new int[bytesOut];
+		//	bool printPadding = map.IncludePadding;
+		//	long streamLength = 0;
+		//	int paddingCount = 0;
+		//
+		//	while(true)
+		//	{
+		//		Array.Clear(bufferIn,0,bufferIn.Length);
+		//		Array.Clear(bufferOut,0,bufferOut.Length);
+		//		int read = s.Read(bufferIn,0,bytesIn);
+		//		if (read < 1) { break; }
+		//		streamLength += read;
+		//
+		//		Array.Reverse(bufferIn); //bit to little endian
+		//		BigInteger bi = new BigInteger(bufferIn);
+		//
+		//		//..and return the chars backwards also
+		//		int count = bufferOut.Length;
+		//		while(bi > 0) {
+		//			//core of the conversion is just finding successive remainders
+		//			bi = BigInteger.DivRem(bi,@base,out BigInteger rem);
+		//			bufferOut[--count] = (int)rem;
+		//		}
+		//
+		//		//deal with the padding
+		//		if (read < bytesIn) {
+		//			long outLen = (long)Math.Ceiling(
+		//				streamLength * (double)bytesOut/(double)bytesIn
+		//			);
+		//			long padLen = LongCeil(outLen,bytesOut) * bytesOut;
+		//			paddingCount = (int)(padLen - outLen);
+		//		}
+		//
+		//		// actuall encoding step
+		//		for(int i = 0; i < bytesOut - paddingCount; i++) {
+		//			int val = bufferOut[i];
+		//			char c = map.Map(val);
+		//			yield return c;
+		//		}
+		//
+		//		// return padding if necessary
+		//		if (printPadding && paddingCount > 0) {
+		//			for(int p = 0; p < paddingCount; p++) {
+		//				yield return map.Padding;
+		//			}
+		//		}
+		//
+		//		if (read < bytesIn) { break; }
+		//	}
+		//}
+		//
+		//public static IEnumerable<char> Decode_1(Stream s, ICharLookup map)
+		//{
+		//	int bytesIn = map.BytesIn;
+		//	int bytesOut = map.BytesOut;
+		//	int @base = map.Base();
+		//	byte[] bufferIn = new byte[bytesIn];
+		//	int[] bufferOut = new int[bytesOut];
+		//
+		//	return null;
+		//}
 
 		public static IEnumerable<char> Encode(Stream s, ICharLookup map)
 		{
@@ -155,19 +152,6 @@ namespace TuckBytesInCode
 					}
 				}
 			}
-
-//					int val = outArr[o];
-//					if (false && val == 0) {
-//						if (outMap.IncludePadding) {
-//							yield return outMap.Padding;
-//						} else {
-//							break;
-//						}
-//					} else {
-//						char c = outMap.Map(val);
-//						yield return c;
-//					}
-
 		}
 
 		static IEnumerable<int> ChangeBaseInternal(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)

@@ -18,7 +18,7 @@ namespace TuckBytesInCode
 			using (var fs = File.Open(args[0],FileMode.Open,FileAccess.Read,FileShare.Read))
 			{
 				int count = 0;
-				var chars = TuckBytes.Encode(fs,CodecUtf8NAscii.Self);
+				var chars = TuckBytes.Encode(fs,CodecBase14k.Self);
 				foreach(char c in chars) {
 					Console.Write(c);
 					count++;
