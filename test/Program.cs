@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -11,7 +12,22 @@ namespace test
 	{
 		static void Main(string[] args)
 		{
-			var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
+			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+
+			var tb = new TestBase();
+			tb.Test64_Encode_1();
+			// tb.Test85_Encode_1();
+		}
+
+		static void Main1(string[] args)
+		{
+			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+
+			// var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
+			var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase64.Self);
+			// var next = TuckBytes.ChangeBase(TestBase.B85Text,CodecBase85.Self,CodecBase256.Self);
+			// var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase85.Self);
+			
 			foreach(char c in next) {
 				char p = c;
 				if (Char.IsControl(c)) { p = ' '; }
@@ -26,11 +42,6 @@ namespace test
 				int x = gf.Map(c);
 				Console.WriteLine(c+"\t"+x);
 			}
-			return;
-
-			var tb = new TestBase();
-			// tb.Test64_Encode_1();
-			tb.Test85_Encode_1();
 			return;
 
 			//Console.WriteLine(CodecUtf8NAscii.AllChars.Length); return;

@@ -26,7 +26,7 @@ namespace TuckBytesInCode
 		//	}
 		//}
 
-		public static IEnumerable<char> Encode(Stream s, ICharLookup map)
+		public static IEnumerable<char> Encode_1(Stream s, ICharLookup map)
 		{
 			int bytesIn = map.BytesIn;
 			int bytesOut = map.BytesOut;
@@ -83,7 +83,7 @@ namespace TuckBytesInCode
 			}
 		}
 
-		public static IEnumerable<char> Decode(Stream s, ICharLookup map)
+		public static IEnumerable<char> Decode_1(Stream s, ICharLookup map)
 		{
 			int bytesIn = map.BytesIn;
 			int bytesOut = map.BytesOut;
@@ -97,7 +97,80 @@ namespace TuckBytesInCode
 			return null;
 		}
 
+		public static IEnumerable<char> Encode(Stream s, ICharLookup map)
+		{
+			var chars = StreamAsChars(s);
+			var iter = ChangeBase(chars,CodecBase256.Self,map);
+			return iter;
+		}
+
+		public static IEnumerable<char> Decode(Stream s, ICharLookup map)
+		{
+			var chars = StreamAsChars(s);
+			var iter = ChangeBase(chars,map,CodecBase256.Self);
+			return iter;
+		}
+
 		public static IEnumerable<char> ChangeBase(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
+		{
+			int charsOut = inMap.BytesIn * outMap.BytesOut;
+			var valIter = ChangeBaseInternal(src,inMap,outMap);
+			int[] currArr = new int[charsOut];
+			int[] lastArr = null;
+			int pos = 0;
+
+			foreach(int val in valIter)
+			{
+				currArr[pos] = val;
+				if (lastArr != null) {
+					char c = outMap.Map(lastArr[pos]);
+					yield return c;
+				}
+				pos++;
+				if (pos >= charsOut) {
+					pos = 0;
+					if (lastArr == null) {
+						lastArr = new int[charsOut];
+					}
+					int[] temp = currArr;
+					currArr = lastArr;
+					lastArr = temp;
+					Array.Clear(currArr,0,charsOut);
+				}
+			}
+
+			if (lastArr != null)
+			{
+				int pad = 0;
+				for(int v = charsOut - 1; v>=0; v--) {
+					if (lastArr[v] == 0) { pad++; }
+				}
+				for(int i = 0; i<charsOut - pad; i++) {
+					char c = outMap.Map(lastArr[i]);
+					yield return c;
+				}
+				if (outMap.IncludePadding) {
+					for(int p = 0; p<pad; p++) {
+						yield return outMap.Padding;
+					}
+				}
+			}
+
+//					int val = outArr[o];
+//					if (false && val == 0) {
+//						if (outMap.IncludePadding) {
+//							yield return outMap.Padding;
+//						} else {
+//							break;
+//						}
+//					} else {
+//						char c = outMap.Map(val);
+//						yield return c;
+//					}
+
+		}
+
+		static IEnumerable<int> ChangeBaseInternal(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
 		{
 			int charsOut = inMap.BytesIn * outMap.BytesOut;
 			int charsIn = inMap.BytesOut * outMap.BytesIn;
@@ -106,6 +179,8 @@ namespace TuckBytesInCode
 			int[] outArr = new int[charsOut];
 			var etor = src.GetEnumerator();
 			bool done = false;
+			int inBase = inMap.Base();
+			int outBase = outMap.Base();
 
 			while(!done)
 			{
@@ -127,17 +202,16 @@ namespace TuckBytesInCode
 					inCount++;
 				}
 
-				ChangeBase(inMap.Base(),outMap.Base(),inArr,ref outArr);
+				int charsSet = ChangeBase(inBase,outBase,inArr,ref outArr);
 
-				for(int o=charsOut-1; o >= 0; o--)
+				for(int o=charsSet-1; o >= 0; o--)
 				{
-					char c = outMap.Map(outArr[o]);
-					yield return c;
+					yield return outArr[o];
 				}
 			}
 		}
 
-		static void ChangeBase(int baseIn, int baseOut, int[] digitsIn, ref int[] digitsOut)
+		static int ChangeBase(int baseIn, int baseOut, int[] digitsIn, ref int[] digitsOut)
 		{
 			BigInteger base10 = BigInteger.Zero;
 			BigInteger bBaseIn = (BigInteger)baseIn;
@@ -157,11 +231,20 @@ namespace TuckBytesInCode
 				digitsOut[o] = (int)rem;
 				o++;
 			}
+			return o;
 		}
 
 		static long LongCeil(long num, long den)
 		{
 			return num / den + (num % den == 0 ? 0 : 1);
+		}
+
+		static IEnumerable<char> StreamAsChars(Stream s)
+		{
+			int val;
+			while(0 <= (val = s.ReadByte())) {
+				yield return (char)val;
+			}
 		}
 	}
 }
