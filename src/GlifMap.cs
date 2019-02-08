@@ -17,10 +17,16 @@ namespace TuckBytesInCode
 			for(int b=0; b<@base; b++) {
 				lookup.Add(map.Map(b),b);
 			}
+			if (map.IncludePadding) {
+				Padding = map.Padding;
+			}
 		}
 
 		public int Map(char glif)
 		{
+			if (Padding.HasValue && glif == Padding.Value) {
+				return 0;
+			}
 			if (!lookup.TryGetValue(glif,out int index)) {
 				throw new KeyNotFoundException("Failed to reverse map "+glif);
 			}
@@ -28,5 +34,6 @@ namespace TuckBytesInCode
 		}
 
 		Dictionary<char,int> lookup;
+		char? Padding = null;
 	}
 }
