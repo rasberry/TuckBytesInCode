@@ -9,91 +9,6 @@ namespace TuckBytesInCode
 {
 	public static class TuckBytes
 	{
-		//public static IEnumerable<char> Encode(Stream s, ICharLookup map)
-		//{
-		//	//int baseBitLength = (int)Math.Floor(Math.Log((double)map.Base,2.0));
-		//	int baseBitLength = 1;
-		//	var reader = new BitReader(s);
-		//
-		//	while(true)
-		//	{
-		//		int bits = reader.ReadBitsAsInt(baseBitLength);
-		//		if (bits == -1) {
-		//			break;
-		//		} else {
-		//			yield return map.Map(bits);
-		//		}
-		//	}
-		//}
-
-		//public static IEnumerable<char> Encode_1(Stream s, ICharLookup map)
-		//{
-		//	int bytesIn = map.BytesIn;
-		//	int bytesOut = map.BytesOut;
-		//	int @base = map.Base();
-		//	byte[] bufferIn = new byte[bytesIn];
-		//	int[] bufferOut = new int[bytesOut];
-		//	bool printPadding = map.IncludePadding;
-		//	long streamLength = 0;
-		//	int paddingCount = 0;
-		//
-		//	while(true)
-		//	{
-		//		Array.Clear(bufferIn,0,bufferIn.Length);
-		//		Array.Clear(bufferOut,0,bufferOut.Length);
-		//		int read = s.Read(bufferIn,0,bytesIn);
-		//		if (read < 1) { break; }
-		//		streamLength += read;
-		//
-		//		Array.Reverse(bufferIn); //bit to little endian
-		//		BigInteger bi = new BigInteger(bufferIn);
-		//
-		//		//..and return the chars backwards also
-		//		int count = bufferOut.Length;
-		//		while(bi > 0) {
-		//			//core of the conversion is just finding successive remainders
-		//			bi = BigInteger.DivRem(bi,@base,out BigInteger rem);
-		//			bufferOut[--count] = (int)rem;
-		//		}
-		//
-		//		//deal with the padding
-		//		if (read < bytesIn) {
-		//			long outLen = (long)Math.Ceiling(
-		//				streamLength * (double)bytesOut/(double)bytesIn
-		//			);
-		//			long padLen = LongCeil(outLen,bytesOut) * bytesOut;
-		//			paddingCount = (int)(padLen - outLen);
-		//		}
-		//
-		//		// actuall encoding step
-		//		for(int i = 0; i < bytesOut - paddingCount; i++) {
-		//			int val = bufferOut[i];
-		//			char c = map.Map(val);
-		//			yield return c;
-		//		}
-		//
-		//		// return padding if necessary
-		//		if (printPadding && paddingCount > 0) {
-		//			for(int p = 0; p < paddingCount; p++) {
-		//				yield return map.Padding;
-		//			}
-		//		}
-		//
-		//		if (read < bytesIn) { break; }
-		//	}
-		//}
-		//
-		//public static IEnumerable<char> Decode_1(Stream s, ICharLookup map)
-		//{
-		//	int bytesIn = map.BytesIn;
-		//	int bytesOut = map.BytesOut;
-		//	int @base = map.Base();
-		//	byte[] bufferIn = new byte[bytesIn];
-		//	int[] bufferOut = new int[bytesOut];
-		//
-		//	return null;
-		//}
-
 		public static IEnumerable<char> Encode(Stream s, ICharLookup map)
 		{
 			var chars = StreamAsChars(s);
@@ -110,6 +25,9 @@ namespace TuckBytesInCode
 
 		public static IEnumerable<char> ChangeBase(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
 		{
+			//To deal with the padding, this hangs on to the previous array of converted characters
+			// so that we can take any trailing 0 values and either remove or convert to padding
+			//TODO maybe merge this with ChangeBaseInternal since ChangeBaseInternal is now farily simple
 			int charsOut = inMap.BytesIn * outMap.BytesOut;
 			var valIter = ChangeBaseInternal(src,inMap,outMap);
 			int[] currArr = new int[charsOut];
@@ -156,15 +74,19 @@ namespace TuckBytesInCode
 
 		static IEnumerable<int> ChangeBaseInternal(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
 		{
+			//the following calculation is a bit magical
+			// i'm not exactly sure why this works out but it does
 			int charsOut = inMap.BytesIn * outMap.BytesOut;
 			int charsIn = inMap.BytesOut * outMap.BytesIn;
+
 			var unInMap = new GlifMap(inMap);
 			int[] inArr = new int[charsIn];
 			int[] outArr = new int[charsOut];
-			var etor = src.GetEnumerator();
-			bool done = false;
 			int inBase = inMap.Base();
 			int outBase = outMap.Base();
+
+			var iter = src.GetEnumerator();
+			bool done = false;
 
 			while(!done)
 			{
@@ -174,8 +96,10 @@ namespace TuckBytesInCode
 				int inCount = 0;
 				while(inCount < charsIn)
 				{
-					if (etor.MoveNext()) {
-						int digit = unInMap.Map(etor.Current);
+					if (iter.MoveNext()) {
+						int digit = unInMap.Map(iter.Current);
+
+						//reverse incoming bigendgian order
 						int iIndex = charsIn - inCount - 1;
 						inArr[iIndex] = digit;
 					}
@@ -186,8 +110,10 @@ namespace TuckBytesInCode
 					inCount++;
 				}
 
+				//base calculation is done in little endian
 				int charsSet = ChangeBase(inBase,outBase,inArr,ref outArr);
 
+				//reverse again to restore big endianess
 				for(int o=charsSet-1; o >= 0; o--)
 				{
 					yield return outArr[o];

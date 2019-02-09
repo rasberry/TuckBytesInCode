@@ -5,7 +5,7 @@ Experimenting with ways to stuff binary data into source code
 ## math ##
 There seems be some unerlying math for any base converison formula.
 
-The next table shows that bytes in and bytes out can be used to calculate the base using the formula: `ceiling(2 ^ (8 * bytes in / chars out))`
+The next table shows that bytes in and characters out can be used to calculate the base using the formula: `ceiling(2 ^ (8 * bytes in / chars out))`
 Ceiling is used since we need a whole number of characters in a base
 
 | base name  | bytes-in | chars-out | calculated base |
@@ -47,11 +47,11 @@ Here's the ratios for the bases being used so far compared to the bytes-in / cha
 | 91    | 0.813474330024837 | 13 / 16 | 0.8125           | 90.5096679918781 |
 | 14938 | 1.733337422860250 | 26 / 15 | 1.73333333333333 | 14937.6612525378 |
 
-You can see that the fractions that were picked produce decimals that are just slightly below the target ratio. Also notice that when we don't ceiling the ratio to base calculation, that the base number is close to the whole number base.
+You can see that the fractions that were picked produce decimals that are just slightly below the target (`r`) ratio. Also notice that when we don't ceiling the ratio to base calculation, that the base number is close to the whole number base.
 
 The difficulty with finding a bytes-in / chars-out fraction starting from just the ratio is that it's somewhat difficult to find a fraction that fits - we want a ratio that as close as possible without going over but that still uses small-ish numbers.
 
-There are several algorithms for finding fractions that fit our decimal. I've included some links with more information. One method I've been using with excel is a brute force search which is also described below.
+There are several algorithms for finding fractions that fit our decimal. I've included some links with more information. One method I've been using with excel is a brute force search which is described below.
 
 ### links related to converting decimal to fraction ###
 * [Algorithm for simplifying decimal to fractions](https://stackoverflow.com/questions/5124743/algorithm-for-simplifying-decimal-to-fractions)
@@ -98,4 +98,8 @@ here's an example of the spread sheet using base 91 (in A2). The best row turns 
 | _22_ | 15             | 19            | 0.78947368421 | 24            | 80              |
 | _23_ | 16             | 20            | 0.8           | 13.47         | 85              |
 
+## TuckBytes.ChangeBase ##
+In my first attempt at base conversion I started to write encode and decode functions, but I found that most of the code was the similar. On second try, I was able to combine both into a single function. TuckBytes.ChangeBase is a binary-to-text style converter and is not an intended for general-purpose numeric base conversion. Currently it really only works well if one of the sides is base256 (binary). It's possible that there might be a way to go directly say from base64 to base85, but I have not determined if that's possible without first going through base256.
+
 ## notes ##
+* base91 doesn't seem to encode the same way as base64 or base85. Need to investigate further.

@@ -119,7 +119,7 @@ namespace test
 			using (var sw = new StreamWriter(fs,Encoding.UTF8))
 			{
 				int count = 0;
-				foreach(char c in DoSomething())
+				foreach(char c in GetUnicodeData())
 				{
 					var cat = char.GetUnicodeCategory(c);
 					if (false
@@ -162,7 +162,7 @@ namespace test
 			}
 		}
 
-		static IEnumerable<char> DoSomething()
+		static IEnumerable<char> GetUnicodeData()
 		{
 			System.Net.WebClient client = new System.Net.WebClient();
 			string definedCodePoints = File.ReadAllText("UnicodeData.txt");

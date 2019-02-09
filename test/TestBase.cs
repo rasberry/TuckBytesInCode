@@ -59,7 +59,7 @@ namespace test
 		}
 
 		//TODO base91 seems to encode differently than 64/85
-		// maybe it doesn't switch from little to big endian
+		// maybe it uses little endian ?
 		//[TestMethod] public void Test91_Encode_1()
 		//{
 		//	TestEncode(OrigText,B91Text,CodecBase91.Self);

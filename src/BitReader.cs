@@ -3,6 +3,8 @@ using System.IO;
 
 namespace TuckBytesInCode
 {
+	//TODO ended up not using BitReader, but it could be usefull.
+	// Need to put this somewhere else - maybe it's own project
 	public class BitReader
 	{
 		public BitReader(Stream s)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace TuckBytesInCode
 {
+	//GlifMap creates a reverse lookup; character -> index
 	public class GlifMap
 	{
 		public GlifMap(ICharLookup map)
@@ -22,6 +23,7 @@ namespace TuckBytesInCode
 			}
 		}
 
+		//lookup the index for a given character
 		public int Map(char glif)
 		{
 			if (Padding.HasValue && glif == Padding.Value) {
