@@ -24,12 +24,14 @@ namespace test
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
 
-			// var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
-			// var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase64.Self);
-			// var next = TuckBytes.ChangeBase(TestBase.B85Text,CodecBase85.Self,CodecBase256.Self);
-			// var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase85.Self);
+			//var next = TuckBytes.ChangeBase(TestBase.B64Text,CodecBase64.Self,CodecBase256.Self);
+			//var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase64.Self);
+			//var next = TuckBytes.ChangeBase(TestBase.B85Text,CodecBase85.Self,CodecBase256.Self);
+			//var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase85.Self);
+			//var next = TuckBytes.ChangeBase("123456789123456789123456789123456789123456789123456789",CodecBase10.Self,CodecBase256.Self);
+			//var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase16.Self);
 			var next = TuckBytes.ChangeBase(TestBase.OrigText,CodecBase256.Self,CodecBase91.Self);
-			
+
 			foreach(char c in next) {
 				char p = c;
 				if (Char.IsControl(c)) { p = ' '; }
