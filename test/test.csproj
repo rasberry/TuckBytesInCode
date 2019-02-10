@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
-    <StartupObject>test.Program</StartupObject>
+    <StartupObject>TuckBytesInCode.Test.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

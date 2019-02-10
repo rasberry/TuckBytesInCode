@@ -341,3 +341,6 @@ ASALocalRun/
 # End of https://www.gitignore.io/api/csharp
 .vscode
 *.txt
+*.data
+*.b64
+*.orig

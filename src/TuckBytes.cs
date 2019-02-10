@@ -9,17 +9,23 @@ namespace TuckBytesInCode
 {
 	public static class TuckBytes
 	{
-		public static IEnumerable<char> Encode(Stream s, ICharLookup map)
+		public static IEnumerable<char> Encode(ICodecIO s, ICharLookup map)
 		{
-			var chars = StreamAsChars(s);
+			var chars = StreamAsChars(s,map.TreatAsBinary);
 			var iter = ChangeBase(chars,CodecBase256.Self,map);
 			return iter;
 		}
 
-		public static IEnumerable<char> Decode(Stream s, ICharLookup map)
+		public static IEnumerable<char> Decode(ICodecIO s, ICharLookup map)
 		{
-			var chars = StreamAsChars(s);
+			var chars = StreamAsChars(s,map.TreatAsBinary);
 			var iter = ChangeBase(chars,map,CodecBase256.Self);
+			return iter;
+		}
+		public static IEnumerable<char> ChangeBase(ICodecIO s, ICharLookup inMap, ICharLookup outMap)
+		{
+			var chars = StreamAsChars(s,inMap.TreatAsBinary);
+			var iter = ChangeBase(chars,inMap,outMap);
 			return iter;
 		}
 
@@ -28,7 +34,7 @@ namespace TuckBytesInCode
 			//To deal with the padding, this hangs on to the previous array of converted characters
 			// so that we can take any trailing 0 values and either remove or convert to padding
 			//TODO maybe merge this with ChangeBaseInternal since ChangeBaseInternal is now farily simple
-			int charsOut = inMap.BytesIn * outMap.BytesOut;
+			int charsOut = inMap.BytesIn * outMap.CharsOut;
 			var valIter = ChangeBaseInternal(src,inMap,outMap);
 			int[] currArr = new int[charsOut];
 			int[] lastArr = null;
@@ -60,24 +66,32 @@ namespace TuckBytesInCode
 				for(int v = charsOut - 1; v>=0; v--) {
 					if (lastArr[v] == 0) { pad++; }
 				}
-				for(int i = 0; i<charsOut - pad; i++) {
-					char c = outMap.Map(lastArr[i]);
-					yield return c;
-				}
-				if (outMap.IncludePadding) {
-					for(int p = 0; p<pad; p++) {
-						yield return outMap.Padding;
+				//output padding if there are any non-zero entries in the last array
+				if (pad < charsOut)
+				{
+					for(int i = 0; i<charsOut - pad; i++) {
+						char c = outMap.Map(lastArr[i]);
+						yield return c;
+					}
+					if (outMap.IncludePadding) {
+						for(int p = 0; p<pad; p++) {
+							yield return outMap.Padding;
+						}
 					}
 				}
+			}
+
+			if (!outMap.TreatAsBinary) {
+				yield return '\n';
 			}
 		}
 
 		static IEnumerable<int> ChangeBaseInternal(IEnumerable<char> src, ICharLookup inMap, ICharLookup outMap)
 		{
-			//the following calculation is a bit magical
+			//the charOut/charsIn calculation is a bit magical
 			// i'm not exactly sure why this works out but it does
-			int charsOut = inMap.BytesIn * outMap.BytesOut;
-			int charsIn = inMap.BytesOut * outMap.BytesIn;
+			int charsOut = inMap.BytesIn * outMap.CharsOut;
+			int charsIn = inMap.CharsOut * outMap.BytesIn;
 
 			var unInMap = new GlifMap(inMap);
 			int[] inArr = new int[charsIn];
@@ -111,10 +125,10 @@ namespace TuckBytesInCode
 				}
 
 				//base calculation is done in little endian
-				int charsSet = ChangeBase(inBase,outBase,inArr,ref outArr);
+				ChangeBase(inBase,outBase,inArr,ref outArr);
 
 				//reverse again to restore big endianess
-				for(int o=charsSet-1; o >= 0; o--)
+				for(int o = charsOut - 1; o >= 0; o--)
 				{
 					yield return outArr[o];
 				}
@@ -123,7 +137,7 @@ namespace TuckBytesInCode
 
 		static int ChangeBase(int baseIn, int baseOut, int[] digitsIn, ref int[] digitsOut)
 		{
-			BigInteger base10 = BigInteger.Zero;
+			BigInteger baseDC = BigInteger.Zero; //base don't care
 			BigInteger bBaseIn = (BigInteger)baseIn;
 			BigInteger bBaseOut = (BigInteger)baseOut;
 			for(int i = 0; i < digitsIn.Length; i++)
@@ -132,12 +146,12 @@ namespace TuckBytesInCode
 				if (digit >= baseIn) {
 					throw new ArgumentNullException("Input digit must be smaller than the base");
 				}
-				base10 += digit * BigInteger.Pow(bBaseIn,i);
+				baseDC += digit * BigInteger.Pow(bBaseIn,i);
 			}
 			int o = 0;
-			while(base10 > 0)
+			while(baseDC > 0)
 			{
-				base10 = BigInteger.DivRem(base10,bBaseOut,out BigInteger rem);
+				baseDC = BigInteger.DivRem(baseDC,bBaseOut,out BigInteger rem);
 				digitsOut[o] = (int)rem;
 				o++;
 			}
@@ -149,11 +163,15 @@ namespace TuckBytesInCode
 			return num / den + (num % den == 0 ? 0 : 1);
 		}
 
-		static IEnumerable<char> StreamAsChars(Stream s)
+		static IEnumerable<char> StreamAsChars(ICodecIO s, bool isBinary)
 		{
 			int val;
-			while(0 <= (val = s.ReadByte())) {
-				yield return (char)val;
+			while((val = s.Read()) >= 0) {
+				char c = (char)val;
+				if (!isBinary && Char.IsControl(c)) {
+					continue;
+				}
+				yield return c;
 			}
 		}
 	}

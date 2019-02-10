@@ -7,8 +7,9 @@ namespace TuckBytesInCode
 	{
 		char Map(int index);
 		int BytesIn { get; }
-		int BytesOut { get; }
+		int CharsOut { get; }
 		char Padding { get; }
 		bool IncludePadding { get; }
+		bool TreatAsBinary { get; }
 	}
 }

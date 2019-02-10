@@ -4,7 +4,7 @@ using System.IO;
 
 namespace TuckBytesInCode
 {
-	public sealed class CodecBase14k : ICharLookup
+	public sealed class CodecBase14k : ICharLookup, IBaseInfo
 	{
 		public char Map(int index)
 		{
@@ -16,7 +16,8 @@ namespace TuckBytesInCode
 		public char Padding { get { return '\0'; }}
 		public bool IncludePadding { get { return false; }}
 		public int BytesIn { get { return 26; }}
-		public int BytesOut { get { return 15; }}
+		public int CharsOut { get { return 15; }}
+		public bool TreatAsBinary { get { return false; }}
 
 		private CodecBase14k() {}
 
@@ -29,6 +30,11 @@ namespace TuckBytesInCode
 				return _self;
 			}
 		}
+
+		public Base Identifier { get { return Base.Base14k; }}
+		public string DisplayName { get { return "Base 14K"; }}
+		public string Description { get { return "text-encoded base 14938 (14k)"; }}
+		public ICharLookup BaseInstance { get { return Self; }}
 
 		//Len = 14938
 		public static string AllChars = ""

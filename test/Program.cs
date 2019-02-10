@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using TuckBytesInCode;
 
-namespace test
+namespace TuckBytesInCode.Test
 {
 	class Program
 	{

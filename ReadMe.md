@@ -101,5 +101,10 @@ here's an example of the spread sheet using base 91 (in A2). The best row turns 
 ## TuckBytes.ChangeBase ##
 In my first attempt at base conversion I started to write encode and decode functions, but I found that most of the code was the similar. On second try, I was able to combine both into a single function. TuckBytes.ChangeBase is a binary-to-text style converter and is not an intended for general-purpose numeric base conversion. Currently it really only works well if one of the sides is base256 (binary). It's possible that there might be a way to go directly say from base64 to base85, but I have not determined if that's possible without first going through base256.
 
-## notes ##
+## TODO ##
 * base91 doesn't seem to encode the same way as base64 or base85. Need to investigate further.
+* add support for variants (see RFC-4648)
+* take a look at https://en.wikipedia.org/wiki/Binary-to-text_encoding
+* take a look at https://www.edn.com/design/systems-design/4460458/2/Convert-binary-number-to-any-base
+* maybe implement normal number base conversions
+** for integers only ? might be difficult to parse fractional non-base10 inputs

@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TuckBytesInCode;
 
-namespace test
+namespace TuckBytesInCode.Test
 {
 	[TestClass]
 	public class TestBase
@@ -17,8 +17,7 @@ namespace test
 
 		static void TestEncode(string inText,string outText, ICharLookup codec)
 		{
-			var s = new MemoryStream(Encoding.ASCII.GetBytes(inText));
-			Trace.WriteLine("s length = "+s.Length);
+			var s = new CodecIO(new StringReader(inText));
 			var enu = TuckBytes.Encode(s,codec);
 			string test = String.Concat(enu);
 			Assert.AreEqual(outText.Length,test.Length);
@@ -30,7 +29,7 @@ namespace test
 
 		static void TestDecode(string inText,string outText, ICharLookup codec)
 		{
-			var s = new MemoryStream(Encoding.ASCII.GetBytes(inText));
+			var s = new CodecIO(new StringReader(inText));
 			var enu = TuckBytes.Decode(s,codec);
 			string test = String.Concat(enu);
 			Assert.AreEqual(outText.Length,test.Length);
@@ -70,6 +69,7 @@ namespace test
 		//}
 
 		// [TestMethod]
+		// direct conversion doesn't work for now
 		public void Test64_to_85_1()
 		{
 			var s = new MemoryStream(Encoding.ASCII.GetBytes(B64Text));

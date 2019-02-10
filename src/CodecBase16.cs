@@ -2,7 +2,7 @@ using System;
 
 namespace TuckBytesInCode
 {
-	public sealed class CodecBase16 : ICharLookup
+	public sealed class CodecBase16 : ICharLookup, IBaseInfo
 	{
 		public char Map(int index)
 		{
@@ -15,7 +15,8 @@ namespace TuckBytesInCode
 		public char Padding { get { return '\0'; }}
 		public bool IncludePadding { get { return false; }}
 		public int BytesIn { get { return 1; }}
-		public int BytesOut { get { return 2; }}
+		public int CharsOut { get { return 2; }}
+		public bool TreatAsBinary { get { return false; }}
 
 		private CodecBase16() {}
 
@@ -28,6 +29,12 @@ namespace TuckBytesInCode
 				return _self;
 			}
 		}
+
+		public Base Identifier { get { return Base.Base16; }}
+		public string DisplayName { get { return "Base 16"; }}
+		public string Description { get { return "text-encoded base 16"; }}
+		public ICharLookup BaseInstance { get { return Self; }}
+
 
 		static string AllChars = "0123456789ABCDEF";
 	}
