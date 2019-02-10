@@ -4,13 +4,14 @@ namespace TuckBytesInCode
 {
 	public enum Base {
 		None = 0,
-		Base10 = 1,
-		Base16 = 2,
-		Base64 = 3,
-		Base85 = 4,
-		Base91 = 5,
-		Base14k = 6,
-		Base256 = 256
+		Base10,
+		Base16,
+		Base64,
+		Base85,
+		Base91,
+		Base94,
+		Base14k,
+		Base256
 	}
 
 	public static class BaseMap
@@ -25,6 +26,7 @@ namespace TuckBytesInCode
 			case Base.Base64:  return CodecBase64.Self;
 			case Base.Base85:  return CodecBase85.Self;
 			// case Base.Base91:  return CodecBase91.Self;
+			case Base.Base94:  return CodecBase94.Self;
 			case Base.Base256: return CodecBase256.Self;
 			}
 

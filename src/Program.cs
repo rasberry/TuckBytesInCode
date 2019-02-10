@@ -14,13 +14,17 @@ namespace TuckBytesInCode
 				Options.Usage();
 				return;
 			} else {
-				Options.Parse(args);
+				if (!Options.Parse(args)) { return; }
 			}
 
 			ICodecIO dataIn = null;
 			ICodecIO dataOut = null;
 			var codecIn = BaseMap.GetInstance(Options.BaseIn);
 			var codecOut = BaseMap.GetInstance(Options.BaseOut);
+			if (codecIn == null || codecOut == null) {
+				Log.Error("codec not available");
+				return;
+			}
 
 			try {
 				if (Options.FileNameIn != null) {

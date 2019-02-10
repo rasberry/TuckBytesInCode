@@ -1,6 +1,6 @@
 # TuckBytesInCode #
 
-Experimenting with ways to stuff binary data into source code
+Experimenting with ways to stuff binary data into source code - Ended up creating a general purpose text-encoded base conversion program
 
 ## math ##
 There seems be some unerlying math for any base converison formula.
