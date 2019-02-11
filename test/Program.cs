@@ -10,6 +10,13 @@ namespace TuckBytesInCode.Test
 {
 	class Program
 	{
+		static void Main(string[] args)
+		{
+			int b = int.Parse(args[0]);
+			Helpers.FindBaseRatio(b, out int bi, out int co);
+			Console.WriteLine("bi = "+bi+" co = "+co);
+		}
+
 		static void Main2(string[] args)
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
@@ -20,7 +27,7 @@ namespace TuckBytesInCode.Test
 			tb.Test64_to_85_1();
 		}
 
-		static void Main(string[] args)
+		static void Main1(string[] args)
 		{
 			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
 

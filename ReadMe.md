@@ -107,4 +107,11 @@ In my first attempt at base conversion I started to write encode and decode func
 * take a look at https://en.wikipedia.org/wiki/Binary-to-text_encoding
 * take a look at https://www.edn.com/design/systems-design/4460458/2/Convert-binary-number-to-any-base
 * maybe implement normal number base conversions
-** for integers only ? might be difficult to parse fractional non-base10 inputs
+  * for integers only ? might be difficult to parse fractional non-base10 inputs
+* maybe add a way to input a custom base
+  * provide an alphabet (ascii or utf8)
+  * determine in/out based on calculation
+    * denominator (loop from 1 to 40 (or more))
+    * numerator = FLOOR(den * base)
+    * calculate closest base  =CEILING(POWER(2,8 * num / den))
+    * search until closest base matches base - num/dev is the in/out

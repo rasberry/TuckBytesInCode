@@ -21,6 +21,11 @@ namespace TuckBytesInCode
 				+"\n                   note: in many cases this will produce invalid output"
 				+"\n -dl              disables adding newlines to the output"
 				+"\n -ll (number)     set how many characters per line (default 76)"
+				// +"\n\n Custom Base Options:"
+				// +"\n -cbi (name)      custom input base (see below)"
+				// +"\n -cbo (name)      custom output base (see below)"
+				// +"\n -cdef (json)     custom base definition (see below)
+				// {name:"", alphabet:"", padding:""}
 			);
 
 			PrintBasesAndVariants();

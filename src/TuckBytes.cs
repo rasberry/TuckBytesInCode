@@ -158,11 +158,6 @@ namespace TuckBytesInCode
 			return o;
 		}
 
-		static long LongCeil(long num, long den)
-		{
-			return num / den + (num % den == 0 ? 0 : 1);
-		}
-
 		static IEnumerable<char> StreamAsChars(ICodecIO s, bool isBinary)
 		{
 			int val;
