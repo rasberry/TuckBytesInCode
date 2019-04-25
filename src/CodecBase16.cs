@@ -32,7 +32,7 @@ namespace TuckBytesInCode
 
 		public Base Identifier { get { return Base.Base16; }}
 		public string DisplayName { get { return "Base 16"; }}
-		public string Description { get { return "text-encoded base 16"; }}
+		public string Description { get { return "text-encoded base 16 - characters 0-9,A-F"; }}
 		public ICharLookup BaseInstance { get { return Self; }}
 
 

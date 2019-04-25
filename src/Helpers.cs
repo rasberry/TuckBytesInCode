@@ -62,5 +62,13 @@ namespace TuckBytesInCode
 			}
 			return subj.Equals(test,StringComparison.OrdinalIgnoreCase);
 		}
+
+		public static string PadTo(this string subj, int len, char padChar = ' ')
+		{
+			if (subj == null || subj.Length >= len) {
+				return subj;
+			}
+			return subj + new String(padChar,len - subj.Length);
+		}
 	}
 }

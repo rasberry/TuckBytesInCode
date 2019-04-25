@@ -41,7 +41,7 @@ namespace TuckBytesInCode
 				if (info == null) { continue; }
 				string arg = item.ToString().ToLowerInvariant();
 				Log.Message(
-					" [" + arg + "] "+info.DisplayName+" - "+info.Description
+					" " + arg.PadTo(12) + info.DisplayName+" - "+info.Description
 				);
 			}
 		}
